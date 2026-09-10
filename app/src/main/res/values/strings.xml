@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">续航模型测试工具</string>
+    <string name="btn_run">运行 eMMC 离线测试</string>
+</resources>

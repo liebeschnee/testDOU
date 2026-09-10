@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    android:sharedUserId="android.uid.system">
+
+    <!-- 离线运行可能需要读写外部存储/日志 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <!--
+      单 APK 模式：instrumentation 声明在主 manifest 中。
+      targetPackage 指向 com.hmdglobal.app.activation（HMD 预装应用，uid=u0_a88），
+      而非主 APP 自身。这样 am instrument 时系统只 force-stop/restart 该无害应用进程，
+      主 APP 的 UI 进程（uid=1000）全程存活，即使用例崩溃也不会连带杀掉 UI。
+      如换设备，改为该设备上任意独立 uid 的已装应用即可。
+    -->
+    <instrumentation
+        android:name="androidx.test.runner.AndroidJUnitRunner"
+        android:targetPackage="com.hmdglobal.app.activation" />
+
+    <application
+        android:label="@string/app_name"
+        android:theme="@style/Theme.TestDrive">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.DayActivity"
+            android:exported="false" />
+    </application>
+
+</manifest>

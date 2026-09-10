@@ -1,0 +1,86 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'test.dou.testdrive'
+    compileSdk rootProject.ext.compileSdk
+
+    defaultConfig {
+        // 系统签名场景：applicationId 必须与 AndroidManifest 的 package 一致
+        applicationId "test.dou.testdrive"
+        minSdk rootProject.ext.minSdk
+        targetSdk rootProject.ext.targetSdk
+        versionCode 1
+        versionName "1.0"
+        // 测试用例已移入 androidTest 源集；instrumentation 在 src/androidTest/AndroidManifest.xml 显式声明，
+        // 因此这里不重复设置 testInstrumentationRunner（避免与 AGP 生成的重复）。
+    }
+
+    signingConfigs {
+        // 系统签名：HMD S2506A 工程机平台密钥（来源 S2506A/platform.pk8 + platform.x509.pem）
+        platform {
+            storeFile file('../keystore/platform-hmd.jks')
+            storePassword 'android'
+            keyAlias 'android'
+            keyPassword 'android'
+        }
+        // 普通签名（非系统签名）：备用
+        dou {
+            storeFile file('../keystore/dou-release.jks')
+            storePassword 'android'
+            keyAlias 'dou'
+            keyPassword 'android'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            // 系统签名：S2506A 平台密钥（platform-hmd.jks 由 S2506A/platform.pk8+pem 生成）
+            signingConfig signingConfigs.platform
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+
+    // ===== 单 APK：测试相关依赖编入主 APK =====
+    implementation 'androidx.test:runner:1.5.2'          // AndroidJUnitRunner
+    implementation 'androidx.test:core:1.5.0'
+    implementation 'androidx.test.ext:junit:1.1.5'
+    implementation 'androidx.test.uiautomator:uiautomator:2.2.0'
+    implementation 'junit:junit:4.13.2'
+}
+
+// ===== 系统签名说明（离线运行前置条件）=====
+// 1. 详见 keystore/README 或 platform 密钥来源
+// 2. 需要 system 权限的打包步骤：
+//    - 用 keytool-importkeypair 导入 platform.pk8 + platform.x509.pem 到签名 jks
+//    - 在下面 signingConfig 指定该 jks，并让 release 使用它
+// 示例（真正构建时取消注释并按实际路径/口令配置）：
+/*
+android {
+    signingConfigs {
+        platform {
+            storeFile file('../keystore/platform.jks')
+            storePassword 'android'
+            keyAlias 'platform'
+            keyPassword 'android'
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.platform
+        }
+    }
+}
+*/

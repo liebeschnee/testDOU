@@ -1,0 +1,47 @@
+# ===== 构建产物 / 缓存 =====
+.gradle/
+build/
+app/build/
+**/build/
+*.apk
+*.aab
+*.dex
+*.class
+
+# ===== IDE =====
+.idea/
+*.iml
+.vscode/
+
+# ===== 签名素材（保密，勿入库）=====
+keystore/*.jks
+keystore/*.pk8
+keystore/*.pem
+S2506A/
+new/
+app/platform.x509.pem
+*.pk8
+*.x509.pem
+*.vbmeta.pem
+
+# ===== 签名工具 / 临时脚本 =====
+apksigner.jar
+signapk.jar
+*_ui.xml
+_instrument_out.txt
+_instrument_out.txt.err
+check_ui.ps1
+verify_run*.ps1
+
+# ===== 临时文件 =====
+1.apk
+*.png
+*_log.txt
+build_log.txt
+
+# ===== Local 配置 =====
+local.properties
+
+# ===== Python 缓存 =====
+__pycache__/
+*.pyc
