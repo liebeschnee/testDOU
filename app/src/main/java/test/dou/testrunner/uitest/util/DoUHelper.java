@@ -175,7 +175,7 @@ public final class DoUHelper {
         return false;
     }
 
-    /** 按描述（contains）点击 */
+    /** 按描述（desc）点击 */
     public static boolean clickDesc(UiDevice device, String desc) {
         UiObject obj = device.findObject(new UiSelector().description(desc));
         if (obj != null && obj.exists()) {
@@ -190,6 +190,7 @@ public final class DoUHelper {
         }
         return false;
     }
+    /** 按描述（contains）点击 */
     public static boolean clickDescContains(UiDevice device, String desc) {
         UiObject obj = device.findObject(new UiSelector().descriptionContains(desc));
         if (obj != null && obj.exists()) {

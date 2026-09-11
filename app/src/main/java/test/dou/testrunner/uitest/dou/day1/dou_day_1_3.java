@@ -54,8 +54,9 @@ public class dou_day_1_3 extends UiAutoTestCase {
             }
             DoUHelper.sleepSec(1);
         }
+        DoUHelper.sleepSec(3);
         Log.i(TAG, "[3] 切换到录像模式");
-        if (!DoUHelper.clickDesc(device, "Video") && !DoUHelper.clickDesc(device, "视频")) {
+        if (!DoUHelper.clickDescContains(device, "Video") && !DoUHelper.clickDescContains(device, "视频")) {
             DoUHelper.clickScreen(device);
         }
         DoUHelper.sleepSec(1);

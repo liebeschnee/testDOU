@@ -79,6 +79,7 @@ public class PopupMonitor {
         addTarget(MatchType.TEXT, "仅在使用中允许");
         addTarget(MatchType.TEXT, "仅在使用该应用时允许");
         addTarget(MatchType.TEXT, "始终允许");
+        addTarget(MatchType.TEXT, "全部允许");
         addTarget(MatchType.TEXT, "While using the app");
         addTarget(MatchType.TEXT, "Allow");
         addTarget(MatchType.TEXT, "Only this time");

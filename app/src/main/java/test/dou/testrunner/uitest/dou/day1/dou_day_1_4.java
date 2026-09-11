@@ -27,8 +27,27 @@ public class dou_day_1_4 extends UiAutoTestCase {
         // Facebook：上传 1 图 + 1 视频，然后上下滑动浏览 40 分钟
         Log.i(TAG, "[1] 启动 Facebook");
         DoUHelper.launchPkg(device, "com.facebook.katana");
+        DoUHelper.sleepSec(10);
         Log.i(TAG, "[2] 点击 Photo 打开上传入口");
-        DoUHelper.clickText(device, "Photo");
+        DoUHelper.clickDescContains(device, "create a new");
+        DoUHelper.sleepSec(2);
+        DoUHelper.clickText(device, "Post");
+        DoUHelper.sleepSec(2);
+        DoUHelper.clickDescContains(device, "Gallery");
+        DoUHelper.sleepSec(2);
+        DoUHelper.clickText(device, "Allow access");
+        DoUHelper.sleepSec(2);
+        DoUHelper.clickText(device, "Allow");
+        DoUHelper.sleepSec(2);
+        DoUHelper.clickDescContains(device, "Video");
+        DoUHelper.sleepSec(2);
+        DoUHelper.clickDescContains(device, "Photo");
+        DoUHelper.sleepSec(2);
+        DoUHelper.clickText(device, "Next");
+        DoUHelper.sleepSec(2);
+        DoUHelper.clickText(device, "Next");
+        DoUHelper.sleepSec(2);
+        DoUHelper.clickText(device, "Post");
         DoUHelper.sleepSec(2);
         Log.i(TAG, "[3] 等待上传完成");
         DoUHelper.sleepSec(5);
