@@ -2,7 +2,6 @@ package test.dou.testdrive;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,14 +23,13 @@ import androidx.core.content.ContextCompat;
 
 import test.dou.testdrive.config.DoUPlan;
 import test.dou.testdrive.report.ProgressStore;
-import test.dou.testdrive.ui.DayActivity;
 import test.dou.testdrive.ui.TestLauncher;
 import test.dou.testrunner.uitest.util.DoUHelper;
 
 /**
- * 主页：循环执行全部 23 个场景，直到电量耗尽自动关机。
- * 每跑完一轮（23 步）轮次号自增，每步的开始/结束电量写入 /sdcard/DOUreport/day_<N>.csv。
- * 点击某一步骤行可进入该轮次的步骤详情（单独运行）。
+ * 主页：只展示 23 个场景列表，每行显示该场景最近一次执行所在轮次
+ * 及测试前/测试后的电量（% 与 mAh）。点“开始循环测试”后从第 1 轮起
+ * 一直循环到电量耗尽自动关机（或用户点停止），不再需要二级界面。
  */
 public class MainActivity extends AppCompatActivity {
 
@@ -147,13 +145,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /** 进入当前轮次的步骤详情（二级菜单），可单独运行某步 */
-    private void openCurrentCycle() {
-        Intent it = new Intent(this, DayActivity.class);
-        it.putExtra("day", currentCycle);
-        startActivity(it);
-    }
-
     private void requestStoragePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             String perm = Manifest.permission.READ_EXTERNAL_STORAGE;
@@ -189,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
         tvOverall.setText("本轮进度: " + passed + " / " + total);
     }
 
-    /** 23 个步骤的列表适配器，展示当前轮次每步状态与测试前后电量 */
+    /** 23 个场景的列表适配器：每行展示该场景最近一次执行的轮次及测试前后电量 */
     private class StepListAdapter extends BaseAdapter {
 
         private final Context ctx;
@@ -223,25 +214,28 @@ public class MainActivity extends AppCompatActivity {
             TextView title = convertView.findViewById(R.id.tvStepTitle);
             TextView detail = convertView.findViewById(R.id.tvStepDetail);
 
-            ProgressStore.Status s = ProgressStore.get(ctx, currentCycle, step);
             cb.setText(step + ". " + DoUPlan.stepTitle(step));
-            cb.setChecked(s == ProgressStore.Status.PASS || s == ProgressStore.Status.RUNNING);
             cb.setEnabled(false);
-            title.setText(statusText(s));
-            detail.setText(detailText(ctx, currentCycle, step));
 
-            // 点击步骤行进入当前轮次详情，可单独运行该步
-            convertView.setOnClickListener(v -> openCurrentCycle());
+            // 只展示该场景最近一次执行的轮次及测试前后电量，无二级界面
+            int round = ProgressStore.getLastRound(ctx, step);
+            if (round <= 0) {
+                cb.setChecked(false);
+                title.setText("尚未测试");
+                detail.setText("");
+            } else {
+                ProgressStore.Status s = ProgressStore.get(ctx, round, step);
+                cb.setChecked(s == ProgressStore.Status.PASS);
+                title.setText(statusText(s));
+                detail.setText("第" + round + "轮  前 " + valor(ProgressStore.getBatteryBefore(ctx, round, step))
+                        + " → 后 " + valor(ProgressStore.getBatteryAfter(ctx, round, step)));
+            }
             return convertView;
         }
 
-        private String detailText(Context ctx, int day, int step) {
-            String before = ProgressStore.getBatteryBefore(ctx, day, step);
-            String after = ProgressStore.getBatteryAfter(ctx, day, step);
-            if (before.isEmpty() && after.isEmpty()) {
-                return "";
-            }
-            return "测试前 " + before + " → 测试后 " + after;
+        /** 电量串 "91% / 4525mAh"，为空回显 "--" */
+        private String valor(String s) {
+            return s == null || s.isEmpty() ? "--" : s;
         }
 
         private String statusText(ProgressStore.Status s) {

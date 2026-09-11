@@ -22,6 +22,7 @@ public final class ProgressStore {
 
     private static final String PREFS = "dou_progress";
     private static final String KEY_PREFIX = "step_";
+    private static final String KEY_PREFIX_LAST_ROUND = "last_round_";
     private static final String KEY_PREFIX_DETAIL = "detail_";
     private static final String KEY_RUN_ACTIVE = "run_active";
 
@@ -58,6 +59,16 @@ public final class ProgressStore {
     /** 记录某天某步的状态 */
     public static void set(Context ctx, int day, int step, Status status) {
         sp(ctx).edit().putString(key(day, step), status.name()).apply();
+    }
+
+    /** 记录某场景最近一次执行所在的轮次（用于主页展示“第几轮”） */
+    public static void setLastRound(Context ctx, int step, int cycle) {
+        sp(ctx).edit().putInt(KEY_PREFIX_LAST_ROUND + step, cycle).apply();
+    }
+
+    /** 读取某场景最近一次执行的轮次，从未执行返回 0 */
+    public static int getLastRound(Context ctx, int step) {
+        return sp(ctx).getInt(KEY_PREFIX_LAST_ROUND + step, 0);
     }
 
     /** 读取某步状态，无记录视为 PENDING */

@@ -37,9 +37,8 @@ TestU/
 ├─ app/
 │  ├─ src/main/java/
 │  │  ├─ test/dou/testdrive/          # 宿主 App
-│  │  │  ├─ MainActivity.java         # 主页：当前轮次 23 步状态 + 整体进度条
+│  │  │  ├─ MainActivity.java         # 主页：23 个场景 + 每场景最近轮次的前后电量
 │  │  │  ├─ ui/
-│  │  │  │  ├─ DayActivity.java       # 二级菜单：某轮 23 步状态 + 前后电量，可单跑一步
 │  │  │  │  └─ TestLauncher.java      # 工作者线程串行执行 am instrument、循环调度、回收结果
 │  │  │  ├─ cmd/
 │  │  │  │  ├─ TestCommand.java       # 拼装 am instrument 命令
@@ -100,11 +99,11 @@ adb install -r app\build\outputs\apk\release\app-release.apk
 ### 4.2 App 内一键跑（离线，无 PC，主线流程）
 
 1. 桌面打开“续航模型测试工具”。
-2. 点“开始循环测试”：从第 1 轮开始，串行执行 23 个场景（复用 Day1 用例类），
-   每一步状态的开始/结束电量（% + mAh）立即写入 `/sdcard/DOUreport/day_<N>.csv`。
-3. 跑完一轮轮次号自增，回到第 1 步继续下一轮，**不限天数，一直循环直到电量耗尽自动关机**；
+2. 主页列出 23 个场景，每行显示该场景最近一次执行所在轮次及测试前/后电量（% + mAh）。
+3. 点“开始循环测试”：从第 1 轮开始，串行执行 23 个场景（复用 Day1 用例类），
+   每步状态的开始/结束电量立即写入 `/sdcard/DOUreport/day_<N>.csv`。
+4. 跑完一轮轮次号自增，回到第 1 步继续下一轮，**不限天数，一直循环直到电量耗尽自动关机**；
    运行中按钮置灰“测试运行中...”。
-4. 点步骤行进入二级菜单，可查看某轮每步状态及“测试前/测试后”电量，也可单独运行某一步。
 5. 需人工结束时点“停止”：发出停止信号、结束当前步骤、把中断的步骤标 FAIL/SKIPPED。
 
 > 前置：工程机已预装被测应用（Google News、相机、Facebook、Gmail、WhatsApp 等）；
@@ -170,7 +169,7 @@ adb pull /sdcard/TestDrive/log/result.txt      # am instrument 结果落盘
 | 内容 | 路径 |
 | --- | --- |
 | 每轮每场景电量报告（% + mAh） | `/sdcard/DOUreport/day_<轮次>.csv` |
-| 电量标记（logcat） | `DOU_BATTERY_BEFORE:` / `DOU_BATTERY_AFTER:` |
+| 测前/测后电量 | 宿主直接用 `BatteryManager` 读取；读不到才回退 logcat 的 `DOU_BATTERY_BEFORE/AFTER` 标记 |
 | UI 树 dump | `/sdcard/TestDrive/run/ui_<时间戳>.xml` |
 | 关键步骤截图 | `/sdcard/TestDrive/run/step_<name>_<时间戳>.png` |
 | am instrument 输出 | `/sdcard/TestDrive/log/result.txt` |

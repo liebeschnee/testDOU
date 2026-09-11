@@ -135,6 +135,7 @@ public class TestLauncher {
                             "testDoU");
 
                     ProgressStore.set(context, day, step, ProgressStore.Status.RUNNING);
+                    ProgressStore.setLastRound(context, step, day);
                     if (callback != null) {
                         callback.onStepUpdated(day, step, "RUNNING");
                     }
@@ -206,6 +207,13 @@ public class TestLauncher {
                                 cls, "testDoU");
 
                         ProgressStore.set(context, cycle, step, ProgressStore.Status.RUNNING);
+                        ProgressStore.setLastRound(context, step, cycle);
+
+                        // 宿主直接读取测前电量（不依赖跨进程 logcat，测前立即可显示/保存），
+                        // 若某机型读不到再回退到 logcat 标记。
+                        String before = readCurrentBattery(context, "DOU_BATTERY_BEFORE");
+                        ProgressStore.setDetail(context, cycle, step, before, "");
+
                         if (callback != null) {
                             callback.onStepUpdated(cycle, step, "RUNNING");
                         }
@@ -230,8 +238,7 @@ public class TestLauncher {
                         LogCollector.write(rs.success, rs.error);
 
                         boolean pass = isPassed(rs);
-                        String before = readBatteryFromLogcat("DOU_BATTERY_BEFORE");
-                        String after = readBatteryFromLogcat("DOU_BATTERY_AFTER");
+                        String after = readCurrentBattery(context, "DOU_BATTERY_AFTER");
 
                         ProgressStore.set(context, cycle, step,
                                 pass ? ProgressStore.Status.PASS : ProgressStore.Status.FAIL);
@@ -267,6 +274,20 @@ public class TestLauncher {
         } catch (Exception e) {
             Log.w(TAG, "清空 logcat 失败", e);
         }
+    }
+
+    /**
+     * 读取当前电量：优先让宿主直接经 BatteryManager 读取（可靠、不依赖跨进程 logcat），
+     * 读不到时回退到 logcat 标记（由用例 @Before/@After 通过 System.out 输出）。
+     */
+    private String readCurrentBattery(Context context, String logcatMarker) {
+        if (context != null) {
+            String s = DoUHelper.readBattery(context);
+            if (s != null && !s.isEmpty()) {
+                return s;
+            }
+        }
+        return logcatMarker == null ? "" : readBatteryFromLogcat(logcatMarker);
     }
 
     /**

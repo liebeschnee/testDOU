@@ -1,5 +1,6 @@
 package test.dou.testdrive.report;
 
+import android.os.Environment;
 import android.util.Log;
 
 import test.dou.testdrive.config.TestConfig;
@@ -28,14 +29,44 @@ public final class DouReport {
     private DouReport() {
     }
 
-    /** 确保报告目录存在，失败则回退到应用私有目录 */
+    /** 已解析并确认可写的报告目录（首次写入时确定），避免每次重复探测 */
+    private static volatile File resolvedDir;
+
+    /**
+     * 确保报告目录存在。依次尝试 /sdcard/DOUreport 与外部存储根下的 DOUreport，
+     * 取第一个可创建/可写的目录；全部失败时回退到配置目录并返回（写入时会再报错）。
+     */
     private static File ensureDir() {
-        File dir = new File(TestConfig.DOU_REPORT_DIR);
-        if (!dir.exists()) {
-            boolean ok = dir.mkdirs();
-            Log.i(TAG, "创建报告目录: " + dir + " -> " + ok);
+        File cached = resolvedDir;
+        if (cached != null) {
+            return cached;
         }
-        return dir;
+        synchronized (DouReport.class) {
+            if (resolvedDir != null) {
+                return resolvedDir;
+            }
+            File fallback = new File(TestConfig.DOU_REPORT_DIR);
+            String[] candidates = {
+                    TestConfig.DOU_REPORT_DIR,
+                    new File(Environment.getExternalStorageDirectory(), "DOUreport").getAbsolutePath()
+            };
+            for (String c : candidates) {
+                try {
+                    File d = new File(c);
+                    if (d.exists() || d.mkdirs()) {
+                        if (d.isDirectory() && (d.canWrite() || d.setWritable(true))) {
+                            resolvedDir = d;
+                            Log.i(TAG, "报告目录已就绪: " + d.getAbsolutePath());
+                            return d;
+                        }
+                    }
+                } catch (Exception e) {
+                    Log.w(TAG, "尝试报告目录失败: " + c, e);
+                }
+            }
+            Log.e(TAG, "所有候选报告目录均不可写，最后回退: " + fallback.getAbsolutePath());
+            return fallback;
+        }
     }
 
     /**
@@ -70,6 +101,7 @@ public final class DouReport {
             fos = new FileOutputStream(file, true);
             OutputStreamWriter os = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
             if (isNew) {
+                os.write('\uFEFF');   // UTF-8 BOM，保证 Excel 正确识别 UTF-8，避免中文标题乱码
                 os.write(CSV_HEADER);
             }
             os.write(line);
