@@ -48,9 +48,26 @@ public final class DoUHelper {
         }
     }
 
+    /** 按包名启动应用，若 Intent 启动失败（异常或前台未切到目标包），
+     *  则回 Home 上滑查找桌面应用名图标点击启动。
+     *  @param pkg    目标包名
+     *  @param appName 桌面图标显示的文本（如 "Facebook"），找不到时上滑重试 */
+    public static void launchPkg(UiDevice device, String pkg, String appName) {
+        if (launchByIntent(device, pkg)) {
+            return;
+        }
+        Log.w(TAG, "Intent 启动失败，改用桌面图标查找: " + pkg + " / " + appName);
+        launchFromHome(device, appName);
+    }
+
     /** 尝试按包名启动应用，成功返回 true，失败（未安装/无 launcher Activity）返回 false。
      *  供场景脚本逐个尝试多个包名时使用，失败不会回 Home。 */
     public static boolean tryLaunchPkg(UiDevice device, String pkg) {
+        return launchByIntent(device, pkg);
+    }
+
+    /** Intent 启动并校验前台是否切到目标包；成功返回 true。 */
+    private static boolean launchByIntent(UiDevice device, String pkg) {
         try {
             Context ctx = InstrumentationRegistry.getInstrumentation().getContext();
             Intent intent = new Intent(Intent.ACTION_MAIN);
@@ -59,10 +76,46 @@ public final class DoUHelper {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             ctx.startActivity(intent);
             device.waitForIdle(3000);
-            Log.i(TAG, "已启动: " + pkg);
-            return true;
+            if (isForegroundPkg(device, pkg)) {
+                Log.i(TAG, "已启动: " + pkg);
+                return true;
+            }
+            Log.w(TAG, "启动后前台非目标包: " + pkg);
         } catch (Exception e) {
-            Log.i(TAG, "包未安装或无可启动 Activity: " + pkg);
+            Log.w(TAG, "Intent 启动异常: " + pkg, e);
+        }
+        return false;
+    }
+
+    /** 回 Home 后上滑查找桌面应用图标并点击；最多上滑 5 次。 */
+    private static void launchFromHome(UiDevice device, String appName) {
+        goHome(device);
+        sleepSec(1);
+        for (int i = 0; i < 5; i++) {
+            UiObject obj = device.findObject(new UiSelector().text(appName));
+            if (obj != null && obj.exists()) {
+                try {
+                    obj.click();
+                    device.waitForIdle(3000);
+                    Log.i(TAG, "桌面图标启动: " + appName);
+                    return;
+                } catch (Exception e) {
+                    Log.w(TAG, "点击桌面图标失败: " + appName, e);
+                }
+            }
+            swipeUp(device);
+            sleepSec(1);
+        }
+        Log.w(TAG, "桌面未找到应用图标: " + appName);
+    }
+
+    /** 检查当前前台窗口所属包名是否为目标包。 */
+    private static boolean isForegroundPkg(UiDevice device, String pkg) {
+        try {
+            String out = device.executeShellCommand("dumpsys window | grep mCurrentFocus");
+            return out != null && out.contains(pkg);
+        } catch (Exception e) {
+            Log.w(TAG, "读取前台包名失败", e);
             return false;
         }
     }

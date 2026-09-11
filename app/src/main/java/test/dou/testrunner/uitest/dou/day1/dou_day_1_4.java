@@ -26,8 +26,10 @@ public class dou_day_1_4 extends UiAutoTestCase {
     public void testDoU() throws Exception {
         // Facebook：上传 1 图 + 1 视频，然后上下滑动浏览 40 分钟
         Log.i(TAG, "[1] 启动 Facebook");
-        DoUHelper.launchPkg(device, "com.facebook.katana");
+        DoUHelper.launchPkg(device, "com.facebook.katana", "Facebook");
         DoUHelper.sleepSec(10);
+        DoUHelper.swipeDown(device);
+        DoUHelper.sleepSec(2);
         Log.i(TAG, "[2] 点击 Photo 打开上传入口");
         DoUHelper.clickDescContains(device, "create a new");
         DoUHelper.sleepSec(2);
@@ -44,11 +46,11 @@ public class dou_day_1_4 extends UiAutoTestCase {
         DoUHelper.clickDescContains(device, "Photo");
         DoUHelper.sleepSec(2);
         DoUHelper.clickText(device, "Next");
-        DoUHelper.sleepSec(2);
+        DoUHelper.sleepSec(3);
         DoUHelper.clickText(device, "Next");
-        DoUHelper.sleepSec(2);
+        DoUHelper.sleepSec(3);
         DoUHelper.clickText(device, "Post");
-        DoUHelper.sleepSec(2);
+        DoUHelper.sleepSec(3);
         Log.i(TAG, "[3] 等待上传完成");
         DoUHelper.sleepSec(5);
         Log.i(TAG, "[4] 上下滑动浏览信息流 40 分钟");

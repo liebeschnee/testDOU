@@ -111,7 +111,6 @@ public class PopupMonitor {
         addTarget(MatchType.TEXT, "知道了");
         addTarget(MatchType.TEXT, "Got it");
         addTarget(MatchType.TEXT, "关闭");
-        addTarget(MatchType.TEXT, "Close");
         addTarget(MatchType.TEXT, "取消");
         addTarget(MatchType.TEXT, "Cancel");
 
@@ -123,7 +122,6 @@ public class PopupMonitor {
 
         // --- DESC 匹配：关闭按钮 / 叉号 ---
         addTarget(MatchType.DESC, "关闭");
-        addTarget(MatchType.DESC, "Close");
         addTarget(MatchType.DESC, "dismiss");
     }
 
