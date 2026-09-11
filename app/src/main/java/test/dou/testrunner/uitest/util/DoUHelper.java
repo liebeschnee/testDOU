@@ -371,10 +371,22 @@ public final class DoUHelper {
         }
     }
 
-    /** 读取当前电量并格式化为 "91% / 4525mAh"（百分比 + 剩余容量 mAh），失败返回空串 */
+    /** 读取当前电量并格式化为 "91% / 4525mAh"（百分比 + 剩余容量 mAh），失败返回空串。
+     *  供 uiautomator 测试进程使用（通过 InstrumentationRegistry 取 Context）。 */
     public static String readBattery() {
         try {
             Context ctx = InstrumentationRegistry.getInstrumentation().getTargetContext();
+            return readBattery(ctx);
+        } catch (Exception e) {
+            Log.w(TAG, "读取电量失败", e);
+            return "";
+        }
+    }
+
+    /** 读取当前电量并格式化为 "91% / 4525mAh"（百分比 + 剩余容量 mAh），失败返回空串。
+     *  供主 APP 进程使用（直接传入 Context，不依赖 InstrumentationRegistry）。 */
+    public static String readBattery(Context ctx) {
+        try {
             BatteryManager bm = (BatteryManager) ctx.getSystemService(Context.BATTERY_SERVICE);
             int percent = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
             double mah = readMah(bm);

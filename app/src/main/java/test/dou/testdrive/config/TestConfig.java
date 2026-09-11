@@ -19,4 +19,7 @@ public final class TestConfig {
 
     /** 结果日志落盘目录（工厂/离线读取用） */
     public static final String LOG_DIR = "/sdcard/TestDrive/log";
+
+    /** DoU 循环测试报告目录：每天(轮)一个 CSV，记录每个场景的开始/结束电量 */
+    public static final String DOU_REPORT_DIR = "/sdcard/DOUreport";
 }

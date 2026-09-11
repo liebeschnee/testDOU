@@ -7,8 +7,10 @@ import test.dou.testdrive.cmd.CMDUtils;
 import test.dou.testdrive.cmd.TestCommand;
 import test.dou.testdrive.config.DoUPlan;
 import test.dou.testdrive.config.TestConfig;
+import test.dou.testdrive.report.DouReport;
 import test.dou.testdrive.report.LogCollector;
 import test.dou.testdrive.report.ProgressStore;
+import test.dou.testrunner.uitest.util.DoUHelper;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -167,6 +169,85 @@ public class TestLauncher {
                         callback.onStepUpdated(day, step, pass ? "PASS" : "FAIL");
                     }
                     logProgress(context, day, step);
+                }
+            } finally {
+                if (onFinished != null) {
+                    onFinished.run();
+                }
+                busy.set(false);
+            }
+        });
+    }
+
+    /**
+     * 循环执行所有步骤直到电量耗尽关机（或用户点击停止）。
+     * 每跑完一轮（1..STEP_COUNT 全部步骤）视为一天，轮次号自增。
+     * 每个场景执行后立即把开始/结束电量写入 /sdcard/DOUreport/day_<N>.csv。
+     *
+     * @param callback  每步状态变化回调（参数为 cycle/step/desc），可能运行于非主线程
+     * @param onFinished 全部结束后回调，可传 null
+     */
+    public void runContinuous(Context context, StepCallback callback, Runnable onFinished) {
+        pool.execute(() -> {
+            busy.set(true);
+            try {
+                int cycle = 1;
+                // 不设电量上限：一直循环，直到设备因低电量自动关机或用户停止。
+                // 每步报告立即 flush，确保关机前已落盘的数据不丢失。
+                while (!isStopRequested()) {
+                    Log.i(TAG, "===== 第 " + cycle + " 轮开始 =====");
+                    for (int step = 1; step <= DoUPlan.STEP_COUNT; step++) {
+                        if (isStopRequested()) break;
+
+                        String cls = DoUPlan.caseClass(cycle, step);
+                        String command = TestCommand.build(
+                                TestConfig.INSTRUMENTATION_TARGET,
+                                TestConfig.RUNNER_CLASS,
+                                cls, "testDoU");
+
+                        ProgressStore.set(context, cycle, step, ProgressStore.Status.RUNNING);
+                        if (callback != null) {
+                            callback.onStepUpdated(cycle, step, "RUNNING");
+                        }
+                        logProgress(context, cycle, step);
+
+                        Log.i(TAG, "第" + cycle + "轮 步骤" + step + " 执行: " + command);
+                        clearLogcat();
+                        CMDUtils.CMD_Result rs;
+                        CMDUtils.CommandSession session = null;
+                        try {
+                            session = CMDUtils.CommandSession.start(command, stopRequested);
+                            liveSession = session;
+                        } catch (Exception e) {
+                            Log.e(TAG, "启动命令失败: " + command, e);
+                        }
+                        if (session == null) {
+                            rs = new CMDUtils.CMD_Result();
+                        } else {
+                            rs = session.await(stopRequested);
+                            liveSession = null;
+                        }
+                        LogCollector.write(rs.success, rs.error);
+
+                        boolean pass = isPassed(rs);
+                        String before = readBatteryFromLogcat("DOU_BATTERY_BEFORE");
+                        String after = readBatteryFromLogcat("DOU_BATTERY_AFTER");
+
+                        ProgressStore.set(context, cycle, step,
+                                pass ? ProgressStore.Status.PASS : ProgressStore.Status.FAIL);
+                        ProgressStore.setDetail(context, cycle, step, before, after);
+
+                        // 写入电量报告：每步立即落盘，避免关机丢失
+                        DouReport.writeStep(cycle, step, DoUPlan.stepTitle(step),
+                                before, after, pass ? "PASS" : "FAIL");
+
+                        if (callback != null) {
+                            callback.onStepUpdated(cycle, step, pass ? "PASS" : "FAIL");
+                        }
+                        logProgress(context, cycle, step);
+                    }
+                    if (isStopRequested()) break;
+                    cycle++;
                 }
             } finally {
                 if (onFinished != null) {

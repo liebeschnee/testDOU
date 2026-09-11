@@ -18,12 +18,29 @@
         android:id="@+id/tvTip"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="勾选要执行的天数，点击天数进入步骤详情；点下方按钮开始测试"
+        android:text="循环执行全部场景，直到电量耗尽自动关机；电量报告输出到 /sdcard/DOUreport/"
         android:textColor="#666666"
         android:textSize="12sp"
-        android:layout_marginBottom="10dp" />
+        android:layout_marginBottom="8dp" />
 
-    <!-- 整体进度条 -->
+    <!-- 当前轮次 + 电量 -->
+    <TextView
+        android:id="@+id/tvCycle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="2dp" />
+
+    <TextView
+        android:id="@+id/tvBattery"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="13sp"
+        android:textColor="#444444"
+        android:layout_marginBottom="2dp" />
+
+    <!-- 当前轮次进度条 -->
     <TextView
         android:id="@+id/tvOverall"
         android:layout_width="match_parent"
@@ -35,12 +52,12 @@
         android:id="@+id/pbOverall"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
-        android:layout_height="20dp"
+        android:layout_height="18dp"
         android:max="100"
-        android:layout_marginBottom="12dp" />
+        android:layout_marginBottom="10dp" />
 
     <ListView
-        android:id="@+id/listDays"
+        android:id="@+id/listSteps"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
@@ -56,7 +73,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="开始测试（勾选天数）" />
+            android:text="开始循环测试" />
 
         <Button
             android:id="@+id/btnStopDays"
