@@ -26,19 +26,19 @@ public class dou_day_1_8 extends UiAutoTestCase {
     public void testDoU() throws Exception {
         // XE Currency：新增 TWD 币种，录入 5 个不同 USD 价格
         Log.i(TAG, "[1] 启动 XE Currency");
-        DoUHelper.launchPkg(device, "com.xe.app");
-        Log.i(TAG, "[2] 点击添加币种入口");
-        DoUHelper.clickText(device, "Add currency");
-        Log.i(TAG, "[3] 输入并确认币种 TWD");
-        DoUHelper.inputText(device, "TWD");
-        DoUHelper.pressEnter(device);
-        DoUHelper.sleepSec(2);
-        Log.i(TAG, "[4] 录入 5 个 USD 价格: 1000/600/500/100/50");
-        int[] prices = {1000, 600, 500, 100, 50};
-        for (int price : prices) {
-            DoUHelper.inputText(device, String.valueOf(price));
-            DoUHelper.pressEnter(device);
-        }
+        DoUHelper.launchPkg(device, "com.xe.app", "Xe");
+//        Log.i(TAG, "[2] 点击添加币种入口");
+//        DoUHelper.clickText(device, "Add currency");
+//        Log.i(TAG, "[3] 输入并确认币种 TWD");
+//        DoUHelper.inputText(device, "TWD");
+//        DoUHelper.pressEnter(device);
+//        DoUHelper.sleepSec(2);
+//        Log.i(TAG, "[4] 录入 5 个 USD 价格: 1000/600/500/100/50");
+//        int[] prices = {1000, 600, 500, 100, 50};
+//        for (int price : prices) {
+//            DoUHelper.inputText(device, String.valueOf(price));
+//            DoUHelper.pressEnter(device);
+//        }
         Log.i(TAG, "[5] 保持应用前台 5 分钟");
         DoUHelper.waitMinutes(5);
     }

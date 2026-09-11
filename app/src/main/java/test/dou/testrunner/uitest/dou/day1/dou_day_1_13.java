@@ -26,16 +26,16 @@ public class dou_day_1_13 extends UiAutoTestCase {
     public void testDoU() throws Exception {
         // Booking.com：搜索当前位置周边酒店，浏览至少 5 家酒店详情与照片
         Log.i(TAG, "[1] 启动 Booking.com");
-        DoUHelper.launchPkg(device, "com.booking");
-        Log.i(TAG, "[2] 点击搜索入口");
-        DoUHelper.clickText(device, "Search");
-        DoUHelper.sleepSec(2);
-        Log.i(TAG, "[3] 浏览至少 5 家酒店详情");
-        for (int i = 1; i <= 5; i++) {
-            Log.i(TAG, "浏览第 " + i + " 家酒店");
-            DoUHelper.swipeUp(device);
-            DoUHelper.sleepSec(2);
-        }
+        DoUHelper.launchPkg(device, "com.google.android.apps.maps");
+//        Log.i(TAG, "[2] 点击搜索入口");
+//        DoUHelper.clickText(device, "Search");
+//        DoUHelper.sleepSec(2);
+//        Log.i(TAG, "[3] 浏览至少 5 家酒店详情");
+//        for (int i = 1; i <= 5; i++) {
+//            Log.i(TAG, "浏览第 " + i + " 家酒店");
+//            DoUHelper.swipeUp(device);
+//            DoUHelper.sleepSec(2);
+//        }
         Log.i(TAG, "[4] 持续上下滑动浏览 20 分钟");
         DoUHelper.waitAndSwipe(device, 20);
     }

@@ -26,10 +26,8 @@ public class dou_day_1_17 extends UiAutoTestCase {
     public void testDoU() throws Exception {
         // Hill Climb Racing：开始一场游戏并玩 30 分钟
         Log.i(TAG, "[1] 启动 Hill Climb Racing");
-        DoUHelper.launchPkg(device, "com.fingersoft.hillclimb");
+        DoUHelper.launchPkg(device, "com.fingersoft.hillclimb", "Hill Climb Racing");
         Log.i(TAG, "[2] 点击 Play 开始游戏");
-        DoUHelper.clickText(device, "Play");
-        DoUHelper.sleepSec(3);
         Log.i(TAG, "[3] 游戏进行 30 分钟");
         DoUHelper.waitMinutes(30);
     }

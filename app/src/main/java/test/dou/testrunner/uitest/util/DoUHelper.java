@@ -126,6 +126,12 @@ public final class DoUHelper {
         device.waitForIdle(1000);
     }
 
+    /** 返回上一级 */
+    public static void goBack(UiDevice device) {
+        device.pressBack();
+        device.waitForIdle(1000);
+    }
+
     // ===================== 手势 / 系统动作 =====================
 
     /** 唤醒并解锁（无密码，上滑解锁） */
@@ -275,6 +281,48 @@ public final class DoUHelper {
             Log.w(TAG, "未找到ID以点击: " + id);
         }
         return false;
+    }
+
+    /** 判断指定文本控件是否存在（精确匹配） */
+    public static boolean existsText(UiDevice device, String text) {
+        if (device == null) {
+            return false;
+        }
+        try {
+            UiObject obj = device.findObject(new UiSelector().text(text));
+            return obj != null && obj.exists();
+        } catch (Exception e) {
+            Log.w(TAG, "判断文本存在失败: " + text, e);
+            return false;
+        }
+    }
+
+    /** 判断指定描述（content-desc）控件是否存在（精确匹配） */
+    public static boolean existsDesc(UiDevice device, String desc) {
+        if (device == null) {
+            return false;
+        }
+        try {
+            UiObject obj = device.findObject(new UiSelector().description(desc));
+            return obj != null && obj.exists();
+        } catch (Exception e) {
+            Log.w(TAG, "判断描述存在失败: " + desc, e);
+            return false;
+        }
+    }
+
+    /** 判断指定资源 ID 控件是否存在（完整 resourceId，如 "com.android.camera:id/shutter_button"） */
+    public static boolean existsID(UiDevice device, String id) {
+        if (device == null) {
+            return false;
+        }
+        try {
+            UiObject obj = device.findObject(new UiSelector().resourceId(id));
+            return obj != null && obj.exists();
+        } catch (Exception e) {
+            Log.w(TAG, "判断ID存在失败: " + id, e);
+            return false;
+        }
     }
 
     /** 向焦点输入框输入文本（无焦点时回退到第一个 EditText） */

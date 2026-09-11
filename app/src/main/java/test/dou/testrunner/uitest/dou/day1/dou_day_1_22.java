@@ -26,10 +26,10 @@ public class dou_day_1_22 extends UiAutoTestCase {
     public void testDoU() throws Exception {
         // Google Map：搜索 Golden Gate Bridge，拖动地图后查看 2 个附加地点 POI 信息
         Log.i(TAG, "[1] 启动 Google Map");
-        DoUHelper.launchPkg(device, "com.google.android.apps.maps");
+        DoUHelper.launchPkg(device, "com.google.android.apps.maps", "地图");
         Log.i(TAG, "[2] 等待并点击搜索框");
-        DoUHelper.waitForVisible(device, "Search");
-        DoUHelper.clickText(device, "Search");
+        DoUHelper.waitForVisible(device, "在此处搜索");
+        DoUHelper.clickText(device, "在此处搜索");
         Log.i(TAG, "[3] 输入地点 Golden Gate Bridge");
         DoUHelper.inputText(device, "Golden Gate Bridge");
         DoUHelper.pressEnter(device);

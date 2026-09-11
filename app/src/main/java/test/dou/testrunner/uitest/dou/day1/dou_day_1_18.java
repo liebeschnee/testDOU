@@ -19,22 +19,21 @@ import test.dou.testrunner.uitest.util.DoUHelper;
  */
 @LargeTest
 public class dou_day_1_18 extends UiAutoTestCase {
-
+    /** 发邮件按钮的 content-desc */
+    private static final String SEND_EMAIL = "com.google.android.gm:id/compose_button";
     private static final String TAG = "dou_day_1_18";
 
     @Test
     public void testDoU() throws Exception {
         // Chrome：输入 URL http://tw.yahoo.com，进入体育页浏览，并发送 3 封带图邮件
         Log.i(TAG, "[1] 启动 Chrome");
-        DoUHelper.launchPkg(device, "com.android.chrome");
+        DoUHelper.launchPkg(device, "com.android.chrome","Chrome");
+        DoUHelper.sleepSec(10);
         Log.i(TAG, "[2] 点击地址栏");
-        DoUHelper.clickText(device, "Search or type web address");
+        DoUHelper.clickID(device, "com.android.chrome:id/search_box_text");
         Log.i(TAG, "[3] 输入 URL http://tw.yahoo.com 并回车");
-        UiObject addressBar = device.findObject(new UiSelector().className("android.widget.EditText"));
-        if (addressBar != null && addressBar.exists()) {
-            addressBar.setText("http://tw.yahoo.com");
-            DoUHelper.pressEnter(device);
-        }
+        DoUHelper.inputText(device,"http://tw.yahoo.com");
+        DoUHelper.pressEnter(device);
         Log.i(TAG, "[4] 点击 Sports 标签");
         DoUHelper.clickText(device, "Sports");
         Log.i(TAG, "[5] 上下滑动浏览 30 分钟");
@@ -44,6 +43,17 @@ public class dou_day_1_18 extends UiAutoTestCase {
             DoUHelper.goHome(device);
             DoUHelper.launchPkg(device, "com.google.android.gm");
             DoUHelper.sleepSec(5);
+            for (int o = 1; o <= 3; o++) {
+                if (DoUHelper.existsID(device, SEND_EMAIL)) {
+                    DoUHelper.clickID(device, SEND_EMAIL);
+                } else {
+                    DoUHelper.goBack(device);
+                }
+            }
+            DoUHelper.inputText(device, "你好!");
+            DoUHelper.sleepSec(2);
+            DoUHelper.clickID(device,"com.google.android.gm:id/send");
+            DoUHelper.sleepSec(2);
         }
     }
 }

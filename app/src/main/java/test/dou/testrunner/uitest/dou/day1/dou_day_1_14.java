@@ -28,7 +28,7 @@ public class dou_day_1_14 extends UiAutoTestCase {
         Log.i(TAG, "[1] 启动 Youtube");
         DoUHelper.launchPkg(device, "com.google.android.youtube");
         Log.i(TAG, "[2] 点击播放高清视频");
-        DoUHelper.clickText(device, "Play");
+        DoUHelper.clickText(device, "Shorts");
         DoUHelper.sleepSec(3);
         Log.i(TAG, "[3] 播放 20 分钟");
         DoUHelper.waitMinutes(20);

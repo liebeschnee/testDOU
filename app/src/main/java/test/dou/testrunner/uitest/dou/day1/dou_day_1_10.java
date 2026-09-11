@@ -26,15 +26,19 @@ public class dou_day_1_10 extends UiAutoTestCase {
     public void testDoU() throws Exception {
         // WhatsApp：收发消息 10 分钟-等 5 分钟，再收发 10 分钟-再等 5 分钟
         Log.i(TAG, "[1] 启动 WhatsApp");
-        DoUHelper.launchPkg(device, "com.whatsapp");
+        DoUHelper.launchPkg(device, "com.whatsapp", "WhatsApp");
+        DoUHelper.sleepSec(10);
         Log.i(TAG, "[2] 两轮收发消息（各 10 分钟）与等待（各 5 分钟）");
+        DoUHelper.clickDescContains(device, "你");
         for (int round = 1; round <= 2; round++) {
             long end = System.currentTimeMillis() + 10 * 60L * 1000L;
             while (System.currentTimeMillis() < end) {
                 Log.i(TAG, "第 " + round + " 轮：点击消息输入框并发送");
-                DoUHelper.clickText(device, "Message");
+                DoUHelper.clickID(device, "com.whatsapp:id/entry");
                 DoUHelper.sleepSec(3);
-                DoUHelper.pressEnter(device);
+                DoUHelper.inputText(device, "你好!");
+                DoUHelper.sleepSec(3);
+                DoUHelper.clickID(device, "com.whatsapp:id/conversation_entry_action_button");
                 DoUHelper.sleepSec(3);
             }
             Log.i(TAG, "第 " + round + " 轮结束，等待 5 分钟");

@@ -26,10 +26,10 @@ public class dou_day_1_11 extends UiAutoTestCase {
     public void testDoU() throws Exception {
         // Facebook Messenger：发起语音通话 10 分钟
         Log.i(TAG, "[1] 启动 Facebook Messenger");
-        DoUHelper.launchPkg(device, "com.facebook.orca");
+        DoUHelper.launchPkg(device, "com.whatsapp", "WhatsApp");
+        DoUHelper.sleepSec(10);
         Log.i(TAG, "[2] 点击语音通话入口");
-        DoUHelper.clickDesc(device, "Voice call");
-        DoUHelper.sleepSec(3);
+        DoUHelper.clickID(device,"com.whatsapp:id/camera_btn");
         Log.i(TAG, "[3] 语音通话 10 分钟");
         DoUHelper.waitMinutes(10);
         Log.i(TAG, "[4] 通话结束回主界面");

@@ -26,11 +26,13 @@ public class dou_day_1_21 extends UiAutoTestCase {
     public void testDoU() throws Exception {
         // Spotify：打开 Daily Mix 开始播放 40 分钟
         Log.i(TAG, "[1] 启动 Spotify");
-        DoUHelper.launchPkg(device, "com.spotify.music");
+        DoUHelper.launchPkg(device, "com.spotify.music","Spotify");
+        DoUHelper.sleepSec(10);
         Log.i(TAG, "[2] 点击 Daily Mix");
-        DoUHelper.clickText(device, "Daily Mix");
+        DoUHelper.clickScreen(device);
+        DoUHelper.sleepSec(3);
         Log.i(TAG, "[3] 点击 Play 开始播放");
-        DoUHelper.clickText(device, "Play");
+        DoUHelper.clickID(device, "com.spotify.music:id/button_play_and_pause");
         DoUHelper.sleepSec(3);
         Log.i(TAG, "[4] 播放音乐 40 分钟");
         DoUHelper.waitMinutes(40);
